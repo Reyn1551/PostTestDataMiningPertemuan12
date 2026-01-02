@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Restoran</title>
+  <style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 20px;
+        background-color: #e0e0e0;
+    }
+
+    form {
+        width: 60%;
+        margin: 0 auto;
+        background-color: #3498db;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        text-align: center;
+        color: #fff;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+        color: #ecf0f1;
+    }
+
+    select, input[type="text"], input[type="number"], input[type="submit"] {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 2px solid #2c3e50;
+        border-radius: 5px;
+        box-sizing: border-box;
+        color: #34495e;
+    }
+
+    input[type="submit"] {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #219d52;
+    }
+
+    input[readonly] {
+        background-color: #d2d2d2;
+    }
+
+    .struk {
+        margin-top: 30px;
+        padding: 25px;
+        width: 45%;
+        margin: 0 auto;
+        background-color: #ecf0f1;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .struk label, .struk input {
+        display: block;
+        margin-bottom: 10px;
+        color: #34495e;
+    }
+
+    .struk input[readonly] {
+        background-color: #d2d2d2;
+    }
+  </style>
+</head>
+
+<body>
+
+    <form id="kasirForm" action="/hitung" method="POST" onsubmit="return validasiForm()">
+
+        <h2> MAKANAN SERBA ACI </h2>
+        <label for="pemesan">Nama Pelanggan:</label>
+        <input type="text" id="pemesan" name="pemesan"><br>
+
+        <label for="namaMakanan">Daftar Makanan:</label>
+        <select name="namaMakanan" id="namaMakanan" onchange="isiHarga()">
+            <option value="0">Pilih Makanan</option>
+            <option value="CILOR">CILOR</option>
+            <option value="MAKLOR">MAKLOR</option>
+            <option value="CIMOL">CIMOL</option>
+            <option value="BAKSO ACI">BAKSO ACI</option>
+            <option value="BAKWAN KAWI">BAKWAN KAWI</option>
+        </select><br>
+
+        <label for="hargaMakanan">Harga Makanan:</label>
+        <input type="text" id="hargaMakanan" name="hargaMakanan"><br>
+
+        <label for="jumlahMakanan">Jumlah Makanan:</label>
+        <input type="number" id="jumlahMakanan" name="jumlahMakanan"><br>
+
+        <input type="submit" value="Tambahkan">
+    </form><br>
+
+    {% if totalHarga and pemesan and namaMakanan and hargaMakanan and jumlahMakanan is defined %}
+    <div class="struk">
+        <center><h3>Pesanan</h3></center>
+        <label for="pemesan">Nama Pelanggan: </label>
+        <input type="text" id="pemesan" value="{{ pemesan }}" readonly><br>
+        <label for="namaMakanan">Makanan: </label>
+        <input type="text" id="namaMakanan" value="{{ namaMakanan }}" readonly><br>
+        <label for="hargaMakanan">Harga Makanan: </label>
+        <input type="number" id="hargaMakanan" value="{{ hargaMakanan }}" readonly><br>
+        <label for="jumlahMakanan">Jumlah Pesanan Makanan: </label>
+        <input type="number" id="jumlahMakanan" value="{{ jumlahMakanan }}" readonly><br>
+        <label for="totalHarga">Total Harga Makanan: </label>
+        <input type="number" id="totalHarga" value="{{ totalHarga }}" readonly><br>
+    </div>
+    {% endif %}
+
+    <script>
+        function isiHarga() {
+            const namaMakanan = document.getElementById("namaMakanan").value;
+            const hargaMakanan = document.getElementById("hargaMakanan");
+
+            const harga = {
+                "CILOR": 1000,
+                "MAKLOR": 500,
+                "CIMOL": 5000,
+                "BAKSO ACI": 10000,
+                "BAKWAN KAWI": 5000
+            };
+
+            hargaMakanan.value = harga[namaMakanan] || 0;
+        }
+
+        function validasiForm() {
+            const pemesan = document.getElementById("pemesan").value.trim();
+            const namaMakanan = document.getElementById("namaMakanan").value;
+            const jumlahMakanan = document.getElementById("jumlahMakanan").value;
+
+            if (!pemesan) {
+                alert("Nama pelanggan harus diisi!");
+                return false;
+            }
+
+            if (namaMakanan === "0") {
+                alert("Silakan pilih makanan!");
+                return false;
+            }
+
+            if (!jumlahMakanan || jumlahMakanan <= 0) {
+                alert("Jumlah makanan harus lebih dari 0!");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+</body>
+</html>

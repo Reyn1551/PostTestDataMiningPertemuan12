@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sushi Tei KW - Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Poppins:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <h1>SUSHI TEI KW</h1>
+        <p>Authentic Japanese Flavors</p>
+    </header>
+
+    <div class="container">
+        <div class="menu-section">
+            <h2>MAKANAN (FOOD)</h2>
+            <div class="menu-grid">
+                {% for nama, harga in makanan.items() %}
+                <div class="menu-item card">
+                    <h3>{{ nama }}</h3>
+                    <p class="price">Rp {{ "{:,.0f}".format(harga) }}</p>
+                    <button class="btn-add" onclick="addToCart('{{ nama }}', {{ harga }})">Tambahkan</button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h2>MINUMAN (DRINK)</h2>
+            <div class="menu-grid">
+                {% for nama, harga in minuman.items() %}
+                <div class="menu-item card">
+                    <h3>{{ nama }}</h3>
+                    <p class="price">Rp {{ "{:,.0f}".format(harga) }}</p>
+                    <button class="btn-add" onclick="addToCart('{{ nama }}', {{ harga }})">Tambahkan</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="order-section">
+            <div class="order-card">
+                <h3>PESANAN ANDA</h3>
+
+                <form id="orderForm" action="/bayar" method="POST" onsubmit="return prepareSubmission()">
+                    <div class="form-group">
+                        <label for="pemesan">Nama Pelanggan:</label>
+                        <input type="text" id="pemesan" name="pemesan" placeholder="Masukkan Nama Anda" required>
+                    </div>
+
+                    <div id="cart-items">
+
+                        <p class="empty-cart">Belum ada pesanan.</p>
+                    </div>
+
+                    <div class="total-display">
+                        <span>Total:</span>
+                        <span id="grand-total">Rp 0</span>
+                    </div>
+
+                    <input type="hidden" name="cart_data" id="cart_data">
+
+                    <button type="submit" class="btn-pay">BAYAR SEKARANG</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+
+        function addToCart(name, price) {
+            let existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCartDisplay();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+        }
+
+        function updateQty(index, change) {
+            if (cart[index].qty + change <= 0) {
+                removeFromCart(index);
+                return;
+            }
+            cart[index].qty += change;
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            const cartContainer = document.getElementById('cart-items');
+            const totalDisplay = document.getElementById('grand-total');
+
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p class="empty-cart">Belum ada pesanan.</p>';
+                totalDisplay.innerText = 'Rp 0';
+                return;
+            }
+
+            let html = '<ul class="cart-list">';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                let subtotal = item.price * item.qty;
+                total += subtotal;
+                html += `
+                    <li>
+                        <div class="cart-item-info">
+                            <span class="cart-item-name">${item.name}</span>
+                            <span class="cart-item-price">@ Rp ${item.price.toLocaleString()}</span>
+                        </div>
+                        <div class="cart-controls">
+                            <button type="button" class="btn-qty" onclick="updateQty(${index}, -1)">-</button>
+                            <span class="qty">${item.qty}</span>
+                            <button type="button" class="btn-qty" onclick="updateQty(${index}, 1)">+</button>
+                            <button type="button" class="btn-remove" onclick="removeFromCart(${index})">X</button>
+                        </div>
+                    </li>
+                `;
+            });
+
+            html += '</ul>';
+            cartContainer.innerHTML = html;
+            totalDisplay.innerText = 'Rp ' + total.toLocaleString();
+        }
+
+        function prepareSubmission() {
+            const pemesan = document.getElementById('pemesan').value.trim();
+            if (!pemesan) {
+                alert("Mohon isi Nama Pelanggan!");
+                return false;
+            }
+            if (cart.length === 0) {
+                alert("Keranjang pesanan masih kosong!");
+                return false;
+            }
+
+            document.getElementById('cart_data').value = JSON.stringify(cart);
+            return true;
+        }
+    </script>
+</body>
+
+</html>

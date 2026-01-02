@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Struk Pembayaran - Sushi Restaurant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="receipt-body">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h1>SUSHI TEI KW</h1>
+            <p>Jl. Jenderal Sudirman No. 1, Tokyo-rta</p>
+            <p>Telp: 021-555-SUSHI</p>
+            <hr>
+        </div>
+        
+        <div class="customer-info">
+            <p><strong>Nama Pelanggan:</strong> {{ pemesan }}</p>
+            <p><strong>Tanggal:</strong> <script>document.write(new Date().toLocaleDateString())</script></p>
+        </div>
+        <hr>
+
+        <table class="receipt-table">
+            <thead>
+                <tr>
+                    <th>Menu</th>
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>Rp {{ "{:,.0f}".format(item.price) }}</td>
+                    <td>Rp {{ "{:,.0f}".format(item.subtotal) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        
+        <div class="total-section">
+            <h3>TOTAL: Rp {{ "{:,.0f}".format(total) }}</h3>
+        </div>
+        
+        <div class="receipt-footer">
+            <p>Terima Kasih atas kunjungan Anda!</p>
+            <p>Arigatou Gozaimasu!</p>
+            <br>
+            <a href="/" class="btn-back">Kembali ke Menu</a>
+        </div>
+    </div>
+</body>
+</html>
